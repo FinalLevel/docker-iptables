@@ -22,7 +22,7 @@ type iptablesService struct {
 	DockerInterface string
 	Rules           map[string][]rule
 	chains          map[string]bool
-	readOnly        bool
+	isTestOnly      bool
 }
 
 func loadIptablesConfig(configPath string) (*iptablesService, error) {
@@ -33,8 +33,8 @@ func loadIptablesConfig(configPath string) (*iptablesService, error) {
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	service := iptablesService{
-		chains:   make(map[string]bool),
-		readOnly: len(os.Getenv("READ_ONLY")) > 0,
+		chains:     make(map[string]bool),
+		isTestOnly: len(os.Getenv("TEST")) > 0,
 	}
 	err = decoder.Decode(&service)
 	if err != nil {
@@ -54,7 +54,7 @@ func loadIptablesConfig(configPath string) (*iptablesService, error) {
 
 func (s *iptablesService) call(args ...string) error {
 	log.Printf("%s %s\n", s.IptablesPath, strings.Join(args, " "))
-	if s.readOnly {
+	if s.isTestOnly {
 		return nil
 	}
 	out, err := exec.Command(s.IptablesPath, args...).CombinedOutput()
@@ -70,7 +70,7 @@ func getShortId(id string) string {
 
 func (s *iptablesService) removeContainerRules(id string) error {
 	log.Printf("Remove container: %s\n", id)
-	if s.readOnly {
+	if s.isTestOnly {
 		return nil
 	}
 	re := regexp.MustCompile(`(?m)^(\d+).*\[` + getShortId(id) + `\]`)
@@ -126,7 +126,7 @@ func (s *iptablesService) addContainerRules(cont *container) error {
 
 func (s *iptablesService) rebuildFirewall(containers containerMap) error {
 	for chain, _ := range s.chains {
-		err := s.call("-t", "nat", "-N", chain) // try to create a chain if it does not exist create it
+		err := s.call("-t", "nat", "-N", chain) // try to create a chain if it exists flush it
 		if err != nil {
 			err := s.call("-t", "nat", "-F", chain)
 			if err != nil {

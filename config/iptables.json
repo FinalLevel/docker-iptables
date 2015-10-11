@@ -2,7 +2,7 @@
 	"IptablesPath" : "/sbin/iptables",
 	"dockerInterface" : "docker0",
 	"rules" : {
-		"test" : [ 
+		"container-name" : [ 
 			{  "ip" : "", "port" : 8080, "chain" :  "DOCKER" },
 			{  "ip" : "", "port" : 53160, "chain" :  "DOCKER" }
 		]
