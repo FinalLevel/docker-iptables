@@ -73,7 +73,7 @@ func (s *iptablesService) removeContainerRules(id string) error {
 	if s.readOnly {
 		return nil
 	}
-	re := regexp.MustCompile(`^(\d+).*\[` + getShortId(id) + `\]`)
+	re := regexp.MustCompile(`(?m)^(\d+).*\[` + getShortId(id) + `\]`)
 	for chain, _ := range s.chains {
 		out, err := exec.Command(s.IptablesPath, "-t", "nat", "-L", chain, "-n", "--line-numbers").CombinedOutput()
 		if err != nil {

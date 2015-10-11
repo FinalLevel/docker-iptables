@@ -75,6 +75,8 @@ func (s *dockerService) dieContainer(id string) {
 			delete(s.containers, id)
 			s.contSync.Unlock()
 			return
+		} else {
+			log.Println(err)
 		}
 	}
 	s.contSync.Unlock()
