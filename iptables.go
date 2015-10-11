@@ -79,11 +79,11 @@ func (s *iptablesService) removeContainerRules(id string) error {
 		if err != nil {
 			return fmt.Errorf("Can't get chain %s rules list %s (%s)", chain, err.Error(), out)
 		}
-		matches := re.FindStringSubmatch(string(out))
-		if len(matches) == 2 {
-			err := s.call("-t", "nat", "-D", chain, matches[1])
+		matches := re.FindAllStringSubmatch(string(out), -1)
+		for _, rule := range matches {
+			err := s.call("-t", "nat", "-D", chain, rule[1])
 			if err != nil {
-				return fmt.Errorf("Can't delete rule %s from chain %s (%s)", matches[1], chain, err.Error())
+				return fmt.Errorf("Can't delete rule %s from chain %s (%s)", rule[1], chain, err.Error())
 			}
 		}
 	}
