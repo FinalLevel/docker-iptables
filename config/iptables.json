@@ -1,0 +1,9 @@
+{
+	"IptablesPath" : "/sbin/iptables",
+	"rules" : {
+		"test" : [ 
+			{  "ip" : "", "port" : 8080, "chain" :  "DOCKER" },
+			{  "ip" : "", "port" : 53160, "chain" :  "DOCKER" }
+		]
+	}
+}
