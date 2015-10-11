@@ -1,5 +1,6 @@
 {
 	"IptablesPath" : "/sbin/iptables",
+	"dockerInterface" : "docker0",
 	"rules" : {
 		"test" : [ 
 			{  "ip" : "", "port" : 8080, "chain" :  "DOCKER" },

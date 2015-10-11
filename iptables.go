@@ -18,10 +18,11 @@ type rule struct {
 }
 
 type iptablesService struct {
-	IptablesPath string
-	Rules        map[string][]rule
-	chains       map[string]bool
-	readOnly     bool
+	IptablesPath    string
+	DockerInterface string
+	Rules           map[string][]rule
+	chains          map[string]bool
+	readOnly        bool
 }
 
 func loadIptablesConfig(configPath string) (*iptablesService, error) {
@@ -100,7 +101,8 @@ func (s *iptablesService) addContainerRules(cont *container) error {
 					if len(rule.HostIp) == 0 {
 						hostIp = "0.0.0.0/0"
 					}
-					err := s.call("-t", "nat", "-A", rule.Chain, "-d", hostIp, "-p", protocol, "-m", protocol,
+					err := s.call("-t", "nat", "-A", rule.Chain, "-d", hostIp, "!", "-i", s.DockerInterface,
+						"-p", protocol, "-m", protocol,
 						"--dport", strconv.FormatInt(int64(bind.Port), 10), "-j", "DNAT",
 						"--to-destination", fmt.Sprintf("%s:%s", cont.Ip, contPort[:len(contPort)-4]),
 						"-m", "comment", "--comment", fmt.Sprintf("'Docker %s[%s]'", cont.Name, cont.Id[:12]))
