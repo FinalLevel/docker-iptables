@@ -64,12 +64,16 @@ func (s *iptablesService) call(args ...string) error {
 	return nil
 }
 
+func getShortId(id string) string {
+	return id[:12]
+}
+
 func (s *iptablesService) removeContainerRules(id string) error {
-	log.Println("Remove container: %s", id)
+	log.Printf("Remove container: %s\n", id)
 	if s.readOnly {
 		return nil
 	}
-	re := regexp.MustCompile(`^(\d+).*\[` + id + `\]`)
+	re := regexp.MustCompile(`^(\d+).*\[` + getShortId(id) + `\]`)
 	for chain, _ := range s.chains {
 		out, err := exec.Command(s.IptablesPath, "-t", "nat", "-L", chain, "-n", "--line-numbers").CombinedOutput()
 		if err != nil {
@@ -105,7 +109,7 @@ func (s *iptablesService) addContainerRules(cont *container) error {
 						"-p", protocol, "-m", protocol,
 						"--dport", strconv.FormatInt(int64(bind.Port), 10), "-j", "DNAT",
 						"--to-destination", fmt.Sprintf("%s:%s", cont.Ip, contPort[:len(contPort)-4]),
-						"-m", "comment", "--comment", fmt.Sprintf("'Docker %s[%s]'", cont.Name, cont.Id[:12]))
+						"-m", "comment", "--comment", fmt.Sprintf("'Docker %s[%s]'", cont.Name, getShortId(cont.Id)))
 					if err != nil {
 						log.Println(err)
 					}
