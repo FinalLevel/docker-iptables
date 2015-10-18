@@ -107,7 +107,7 @@ func (s *iptablesService) addContainerRules(cont *container) error {
 					}
 					hostIp := rule.HostIp
 					if len(rule.HostIp) == 0 {
-						if len(bind.Ip) > 0 {
+						if len(bind.Ip) > 0 && bind.Ip != "0.0.0.0" {
 							hostIp = bind.Ip
 						} else {
 							hostIp = "0.0.0.0/0.0.0.0"
