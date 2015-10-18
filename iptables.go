@@ -113,7 +113,7 @@ func (s *iptablesService) addContainerRules(cont *container) error {
 							hostIp = "0.0.0.0/0"
 						}
 					}
-					err := s.call("-t", "nat", "-A", rule.Chain, "-d", hostIp, "!", "-i", s.DockerInterface,
+					err := s.call("-t", "nat", "-A", rule.Chain, "-d", hostIp,
 						"-p", protocol, "-m", protocol,
 						"--dport", strconv.FormatInt(int64(bind.Port), 10), "-j", "DNAT",
 						"--to-destination", fmt.Sprintf("%s:%s", cont.Ip, contPort[:len(contPort)-4]),
